@@ -140,6 +140,8 @@ document '<
       mid-textbox{Emscripten を使って Wasm に変換できる};
       gap 40pt;
       mid-textbox{Wasm に変換するとブラウザ上で動かせる};
+      gap 40pt;
+      mid-textbox{例: PHP Playground};
     ]);
   >
 
@@ -159,10 +161,12 @@ document '<
   +frame{処理系の紹介}<
     +fig-center(vconcat [
       gap 40pt;
-      mid-textbox{今回作った Wasm 処理系};
-      gap 30pt;
+      mid-textbox{普通のPHP処理系};
+      gap 25pt;
+      mid-textbox{の上に、今回作った Wasm 処理系};
+      gap 25pt;
       mid-textbox{の上に、Wasmに変換されたPHP処理系};
-      gap 30pt;
+      gap 25pt;
       mid-textbox{の上に、\code(`echo "Hello, World!\n";`);};
     ]);
   >
@@ -171,24 +175,11 @@ document '<
     +fig-center(vconcat [
       gap 40pt;
       mid-textbox{普通のPHP処理系};
-      gap 30pt;
+      gap 25pt;
       mid-textbox{の上に、今回作った Wasm 処理系};
-      gap 30pt;
+      gap 25pt;
       mid-textbox{の上に、Wasmに変換されたPHP処理系};
-      gap 30pt;
-      mid-textbox{の上に、\code(`echo "Hello, World!\n";`);};
-    ]);
-  >
-
-  +frame{処理系の紹介}<
-    +fig-center(vconcat [
-      gap 40pt;
-      mid-textbox{普通のPHP処理系};
-      gap 30pt;
-      mid-textbox{の上に、今回作った Wasm 処理系};
-      gap 30pt;
-      mid-textbox{の上に、Wasmに変換されたPHP処理系};
-      gap 30pt;
+      gap 25pt;
       mid-textbox{の上に、\code(`echo "Hello, World!\n";`);};
       gap 50pt;
       mid-textbox{多段になりすぎて実行に30秒かかる};
@@ -205,23 +196,23 @@ document '<
 
   +frame{初期ベンチマーク}<
     +fig-center(vconcat [
-      gap 40pt;
-      mid-textbox{実行時間: 33.327 s};
+      gap 75pt;
+      big-textbox{実行時間: 33.327 s};
       gap 30pt;
-      mid-textbox{メモリ使用量: 2.2 GiB};
+      big-textbox{メモリ使用量: 2.2 GiB};
     ]);
   >
 
   +frame{ボトルネックを探す}<
     +fig-center(vconcat [
-      gap 40pt;
+      gap 20pt;
       include-image 700pt `assets/flamegraph_1.jpeg`;
     ]);
   >
 
   +frame{ボトルネックを探す}<
     +fig-center(vconcat [
-      gap 40pt;
+      gap 20pt;
       include-image 700pt `assets/flamegraph_2.jpeg`;
     ]);
   >
@@ -259,10 +250,10 @@ document '<
 
   +frame{ベンチマーク}<
     +fig-center(vconcat [
-      gap 40pt;
-      mid-textbox{実行時間: 33.327 -\> 29.274 s};
+      gap 75pt;
+      big-textbox{実行時間: 33.327 -\> 29.274 s};
       gap 30pt;
-      mid-textbox{メモリ使用量: 240 MiB (ほぼ10分の1)};
+      big-textbox{メモリ使用量: 240 MiB (ほぼ10分の1)};
     ]);
   >
 
@@ -330,8 +321,8 @@ document '<
 
   +frame{ベンチマーク}<
     +fig-center(vconcat [
-      gap 40pt;
-      mid-textbox{実行時間: 29.274 s -\> 14.666 s};
+      gap 75pt;
+      big-textbox{実行時間: 29.274 s -\> 14.666 s};
     ]);
   >
 
@@ -353,8 +344,8 @@ document '<
 
   +frame{ベンチマーク}<
     +fig-center(vconcat [
-      gap 40pt;
-      mid-textbox{実行時間: 14.666 s -\> 14.644 s};
+      gap 75pt;
+      big-textbox{実行時間: 14.666 s -\> 14.644 s};
     ]);
   >
 
@@ -412,10 +403,10 @@ document '<
 
   +frame{ベンチマーク}<
     +fig-center(vconcat [
-      gap 40pt;
-      mid-textbox{実行時間: 14.644 s -\> 14.185 s};
+      gap 75pt;
+      big-textbox{実行時間: 14.644 s -\> 14.185 s};
       gap 30pt;
-      mid-textbox{メモリ使用量: 240 MiB -\> 187 MiB};
+      big-textbox{メモリ使用量: 240 MiB -\> 187 MiB};
     ]);
   >
 
@@ -447,10 +438,10 @@ document '<
 
   +frame{ベンチマーク}<
     +fig-center(vconcat [
-      gap 40pt;
-      mid-textbox{実行時間: 14.185 s -\> 8.300 s};
+      gap 75pt;
+      big-textbox{実行時間: 14.185 s -\> 8.300 s};
       gap 30pt;
-      mid-textbox{メモリ使用量: 187 MiB -\> 187 MiB};
+      big-textbox{メモリ使用量: 187 MiB -\> 187 MiB};
     ]);
   >
 
@@ -467,8 +458,8 @@ document '<
 
   +frame{ベンチマーク}<
     +fig-center(vconcat [
-      gap 40pt;
-      mid-textbox{実行時間: 8.300 s -\> 6.650 s};
+      gap 75pt;
+      big-textbox{実行時間: 8.300 s -\> 6.650 s};
     ]);
   >
 
@@ -522,15 +513,8 @@ final class Label extends StackEntry { ... }
 
   +frame{ベンチマーク}<
     +fig-center(vconcat [
-      gap 40pt;
-      mid-textbox{実行時間: 6.650 s -\> 4.587 s};
-    ]);
-  >
-
-  +frame{安全装置を切る}<
-    +fig-center(vconcat [
-      gap 40pt;
-      mid-textbox{安全装置を切る};
+      gap 75pt;
+      big-textbox{実行時間: 6.650 s -\> 4.587 s};
     ]);
   >
 
@@ -545,8 +529,8 @@ final class Label extends StackEntry { ... }
 
   +frame{ベンチマーク}<
     +fig-center(vconcat [
-      gap 40pt;
-      mid-textbox{実行時間: 4.587 s -\> 3.407 s};
+      gap 75pt;
+      big-textbox{実行時間: 4.587 s -\> 3.407 s};
     ]);
   >
 
@@ -593,8 +577,8 @@ final class Br extends ControlFlowResult
 
   +frame{ベンチマーク}<
     +fig-center(vconcat [
-      gap 40pt;
-      mid-textbox{実行時間: 3.407 s -\> 3.156 s};
+      gap 75pt;
+      big-textbox{実行時間: 3.407 s -\> 3.156 s};
     ]);
   >
 
@@ -615,7 +599,7 @@ final class Br extends ControlFlowResult
   >
 
   +frame{メモリ表現の最適化}<
-    +code-block-c(`function loadI32(int $n) {
+    +code-block-php(`function loadI32(int $n) {
   $bytes = $this->sliceNBytes($n, 4);
   return unpack('l', $bytes)[1];
 }
@@ -641,9 +625,9 @@ final class Br extends ControlFlowResult
   >
 
   +frame{メモリ表現の最適化}<
-    +code-block-c(`// $this->rawData = $this->ffi->new(
-//   "uint8_t[$this->memorySize]",
-// );
+    +code-block-php(`$this->rawData = $this->ffi->new(
+  "uint8_t[$this->memorySize]",
+);
 
 function loadI32(int $n) {
   $dataAsInt32 = $this->ffi->cast(
@@ -657,19 +641,19 @@ function loadI32(int $n) {
 
   +frame{ベンチマーク}<
     +fig-center(vconcat [
-      gap 40pt;
-      mid-textbox{実行時間: 3.156 s -\> 2.852 s};
+      gap 75pt;
+      big-textbox{実行時間: 3.156 s -\> 2.852 s};
       gap 30pt;
-      mid-textbox{メモリ使用量: 187 MiB -\> 308 MiB};
+      big-textbox{メモリ使用量: 187 MiB -\> 308 MiB};
     ]);
   >
 
   +frame{ベンチマークまとめ}<
     +fig-center(vconcat [
-      gap 40pt;
-      mid-textbox{実行時間: 33.327 s -\> 2.852 s (11.7 倍)};
+      gap 75pt;
+      big-textbox{実行時間: 33.327 s -\> 2.852 s (11.7 倍)};
       gap 30pt;
-      mid-textbox{メモリ使用量: 2.2 GiB -\> 308 MiB (7.4 分の1)};
+      big-textbox{メモリ使用量: 2.2 GiB -\> 308 MiB (7.4 分の1)};
     ]);
   >
 
@@ -677,12 +661,10 @@ function loadI32(int $n) {
 
   +frame{まとめ}<
     +fig-center(vconcat [
-      gap 75pt;
+      gap 60pt;
       mid-textbox{10倍以上速くなった};
-      gap 40pt;
+      gap 50pt;
       mid-textbox{メモリアロケーションを減らす};
-      gap 30pt;
-      mid-textbox{すべての改善でベンチマークを取る};
       gap 30pt;
       mid-textbox{推測・適用・計測のサイクルを回す};
     ]);
