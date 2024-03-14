@@ -1,0 +1,693 @@
+@require: option
+@require: class-slydifi/theme/akasaka
+@require: code-printer/code-design
+@require: code-printer/code-printer
+@require: code-printer/code-syntax
+@require: code-printer/code-theme
+@require: figbox/figbox
+
+let-block +code-block-c source =
+  '<
+    +code-printer?:(
+      CodePrinter.make-config CodeSyntax.c CodeTheme.iceberg-light
+      |> CodePrinter.set-number-fun CodeDesign.number-fun-null
+    )(source);
+  >
+
+let-block +code-block-php source =
+  '<
+    +code-printer?:(
+      CodePrinter.make-config CodeSyntax.php CodeTheme.iceberg-light
+      |> CodePrinter.set-number-fun CodeDesign.number-fun-null
+    )(source);
+  >
+
+let ex-big-textbox ?:size-opt it =
+  let size = Option.from 48pt size-opt in
+    FigBox.textbox?:(set-font-size size) it
+
+let big-textbox ?:size-opt it =
+  let size = Option.from 32pt size-opt in
+    FigBox.textbox?:(set-font-size size) it
+
+let mid-textbox ?:size-opt it =
+  let size = Option.from 24pt size-opt in
+    FigBox.textbox?:(set-font-size size) it
+
+open FigBox
+in
+
+document '<
+  +set-config(|
+    SlydifiThemeAkasaka.default-config with
+    color-emph = Color.black;
+  |);
+
+  +make-title(|
+    title = {
+      |CLIのPHPプログラムを
+      |限界まで高速化してみる
+      |};
+    author = {|nsfisis (いまむら)|};
+    date = {|Ya8 2024|};
+  |);
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  +frame{自己紹介}<
+    +fig-center(vconcat [
+      gap 75pt;
+      hconcat [
+        big-textbox{nsfisis (いまむら)};
+        gap 20pt;
+        include-image 50pt `assets/me.jpeg`;
+      ];
+      gap 30pt;
+      big-textbox{\@ デジタルサーカス株式会社};
+    ]);
+  >
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  +frame{高速化の対象}<
+    +fig-center(vconcat [
+      gap 75pt;
+      big-textbox{PHP で書かれた};
+      gap 20pt;
+      big-textbox{自作の WebAssembly ランタイム};
+      gap 40pt;
+      big-textbox{10倍速くする};
+    ]);
+  >
+
+  +frame{目次}<
+    +fig-center(vconcat [
+      gap 75pt;
+      big-textbox{WebAssembly の簡単な説明};
+      gap 20pt;
+      big-textbox{自作ランタイムの紹介};
+      gap 20pt;
+      big-textbox{高速化};
+    ]);
+  >
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  +section{|WebAssemblyの概要|}<
+
+  +frame{WebAssemblyとは}<
+    +fig-center(vconcat [
+      gap 75pt;
+      big-textbox{WebAssembly (Wasm)};
+      gap 20pt;
+      mid-textbox{ブラウザなどで実行できる};
+      gap 10pt;
+      mid-textbox{ポータブルな仮想命令セット};
+    ]);
+  >
+
+  +frame{WebAssemblyの出自}<
+    +fig-center(vconcat [
+      gap 75pt;
+      mid-textbox{元々のモチベーション: ブラウザ上での高速な処理};
+      gap 20pt;
+      mid-textbox{動的な JavaScript だと限界がある};
+      gap 30pt;
+      mid-textbox{間にいくつかの技術が生まれたり消えたりし、};
+      gap 10pt;
+      mid-textbox{最終的に WebAssembly が策定された};
+    ]);
+  >
+
+  +frame{Emscripten}<
+    +fig-center(vconcat [
+      gap 60pt;
+      big-textbox{Emscripten};
+      gap 40pt;
+      mid-textbox{C/C++ のソースコードを Wasm に変換};
+      gap 20pt;
+      mid-textbox{C/C++ で書かれた膨大な資産を};
+      gap 10pt;
+      mid-textbox{ブラウザの上で動かせる};
+    ]);
+  >
+
+  +frame{Wasmの活用例}<
+    +fig-center(vconcat [
+      gap 50pt;
+      mid-textbox{PHPの処理系はCで書かれている};
+      gap 40pt;
+      mid-textbox{Emscripten を使って Wasm に変換できる};
+      gap 40pt;
+      mid-textbox{Wasm に変換するとブラウザ上で動かせる};
+    ]);
+  >
+
+  >
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  +section{|自作ランタイムの紹介|}<
+
+  +frame{処理系の紹介}<
+    +fig-center(vconcat [
+      gap 30pt;
+      include-image 700pt `assets/screenshot.jpeg`;
+    ]);
+  >
+
+  +frame{処理系の紹介}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{今回作った Wasm 処理系};
+      gap 30pt;
+      mid-textbox{の上に、Wasmに変換されたPHP処理系};
+      gap 30pt;
+      mid-textbox{の上に、\code(`echo "Hello, World!\n";`);};
+    ]);
+  >
+
+  +frame{処理系の紹介}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{普通のPHP処理系};
+      gap 30pt;
+      mid-textbox{の上に、今回作った Wasm 処理系};
+      gap 30pt;
+      mid-textbox{の上に、Wasmに変換されたPHP処理系};
+      gap 30pt;
+      mid-textbox{の上に、\code(`echo "Hello, World!\n";`);};
+    ]);
+  >
+
+  +frame{処理系の紹介}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{普通のPHP処理系};
+      gap 30pt;
+      mid-textbox{の上に、今回作った Wasm 処理系};
+      gap 30pt;
+      mid-textbox{の上に、Wasmに変換されたPHP処理系};
+      gap 30pt;
+      mid-textbox{の上に、\code(`echo "Hello, World!\n";`);};
+      gap 50pt;
+      mid-textbox{多段になりすぎて実行に30秒かかる};
+      gap 20pt;
+      mid-textbox{メモリは 2.2 GiB 使う};
+    ]);
+  >
+
+  >
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  +section{|高速化|}<
+
+  +frame{初期ベンチマーク}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{実行時間: 33.327 s};
+      gap 30pt;
+      mid-textbox{メモリ使用量: 2.2 GiB};
+    ]);
+  >
+
+  +frame{ボトルネックを探す}<
+    +fig-center(vconcat [
+      gap 40pt;
+      include-image 700pt `assets/flamegraph_1.jpeg`;
+    ]);
+  >
+
+  +frame{ボトルネックを探す}<
+    +fig-center(vconcat [
+      gap 40pt;
+      include-image 700pt `assets/flamegraph_2.jpeg`;
+    ]);
+  >
+
+  +frame{ボトルネックを探す}<
+    +fig-center(vconcat [
+      gap 75pt;
+      mid-textbox{初期化処理が遅すぎる};
+      gap 30pt;
+      mid-textbox{メモリの初期化が遅すぎる};
+      gap 40pt;
+      mid-textbox{Wasm のメモリ表現を最適化};
+    ]);
+  >
+
+  +frame{メモリ表現の最適化}<
+    +code-block-php(`$data = array_fill(
+  0,
+  $size * 64 * 1024,
+  0,
+);`);
+    +p{\code(`0`); が \code(`$size * 64 * 1024`); 個並んだ巨大な配列}
+    +p{今回 \code(`$size`); は \code(`2048`);}
+    +p{合計 132,644,864 要素}
+  >
+
+  +frame{メモリ表現の最適化}<
+    +code-block-php(`$data = array_fill(
+  0,
+  $size,
+  str_repeat("\0", 64 * 1024),
+);`);
+    +p{64 KiB の \code(`string`); が \code(`$size`); 個並んだ配列}
+  >
+
+  +frame{ベンチマーク}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{実行時間: 33.327 -\> 29.274 s};
+      gap 30pt;
+      mid-textbox{メモリ使用量: 240 MiB (ほぼ10分の1)};
+    ]);
+  >
+
+  +frame{ボトルネック探しの課題}<
+    +p{Wasm の命令を実行する処理がすべて1つの関数に集約されている}
+    +code-block-php(`function execInstr($instr) {
+  if ($instr instanceof Instrs\Numeric\F32Abs) {
+    ...
+  } elseif ($instr instanceof Instrs\Numeric\F32Add) {
+    ...
+  } elseif ($instr instanceof Instrs\Numeric\F32Ceil) {
+    ...
+  }
+}
+`);
+    +p{どの命令が遅いのかわからない}
+  >
+
+  +frame{ボトルネック探しの課題}<
+    +p{Wasm の命令を実行する処理がすべて1つの関数に集約されている}
+    +code-block-php(`function execInstr($instr) {
+  if ($instr instanceof Instrs\Numeric\F32Abs) {
+    ...
+  } elseif ($instr instanceof Instrs\Numeric\F32Add) {
+    ...
+  } elseif ($instr instanceof Instrs\Numeric\F32Ceil) {
+    ...
+  }
+}
+`);
+    +p{どの命令が遅いのかわからない}
+    +p{命令ごとに関数を分ける}
+  >
+
+  +frame{execInstr の最適化}<
+    +code-block-php(`function execInstr($instr) {
+  if ($instr instanceof Instrs\Numeric\F32Abs) {
+    ...
+  } elseif ($instr instanceof Instrs\Numeric\F32Add) {
+    ...
+  } elseif ($instr instanceof Instrs\Numeric\F32Ceil) {
+    ...
+  }
+}
+`);
+    +p{elseif が多すぎる}
+    +p{クラスの判定が過剰な回数おこなわれる}
+  >
+
+  +frame{execInstr の最適化}<
+    +code-block-php(`function execInstr($instr) {
+  switch ($instr::class) {
+    case Instrs\Numeric\F32Abs::class:
+      ...
+    case Instrs\Numeric\F32Add::class:
+      ...
+    case Instrs\Numeric\F32Ceil::class:
+      ...
+  }
+}
+`);
+    +p{switch-case に}
+    +p{クラスの判定が1回になる}
+  >
+
+  +frame{ベンチマーク}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{実行時間: 29.274 s -\> 14.666 s};
+    ]);
+  >
+
+  +frame{execInstr の分離}<
+    +p{命令ごとに個別の関数を用意}
+    +code-block-php(`function execInstr($instr) {
+  return match ($instr::class) {
+    Instrs\Numeric\F32Abs::class =>
+      $this->execInstrNumericF32Abs($instr),
+    Instrs\Numeric\F32Add::class =>
+      $this->execInstrNumericF32Add($instr),
+    Instrs\Numeric\F32Ceil::class =>
+      $this->execInstrNumericF32Ceil($instr),
+    ...
+  };
+}
+`);
+  >
+
+  +frame{ベンチマーク}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{実行時間: 14.666 s -\> 14.644 s};
+    ]);
+  >
+
+  +frame{ボトルネックは？}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{プロファイラが役に立たなくなってくる};
+      gap 20pt;
+      mid-textbox{単純な命令が天文学的な回数実行される};
+    ]);
+  >
+
+  +frame{ボトルネックは？}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{ではどうするか};
+      gap 40pt;
+      mid-textbox{推測と計測のサイクルを回す};
+    ]);
+  >
+
+  +frame{ボトルネックは？}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{推測と計測のサイクルを回す};
+      gap 30pt;
+      mid-textbox{ボトルネックが減ってくると};
+      gap 20pt;
+      mid-textbox{遅いという確証を得るのが難しくなる};
+      gap 20pt;
+      mid-textbox{実際にやってみて測るしかない};
+    ]);
+  >
+
+  +frame{メモリアロケーションを減らす}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{メモリアロケーションを減らす};
+      gap 40pt;
+      mid-textbox{Strong typedef されたインデックス型};
+    ]);
+  >
+
+  +frame{メモリアロケーションを減らす}<
+    +code-block-php(`final readonly class MemIdx
+{
+  public function __construct(
+    public int $value,
+  ) {
+  }
+}`);
+    +p{実質的にはただの \code(`int`); と同じ}
+    +p{メモリがもったいない}
+  >
+
+  +frame{ベンチマーク}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{実行時間: 14.644 s -\> 14.185 s};
+      gap 30pt;
+      mid-textbox{メモリ使用量: 240 MiB -\> 187 MiB};
+    ]);
+  >
+
+  +frame{メモリアロケーションを減らす}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{Wasm のプリミティブ};
+      gap 30pt;
+      mid-textbox{i32、i64、f32、f64};
+      gap 40pt;
+      mid-textbox{個別にクラスを用意};
+      gap 30pt;
+      mid-textbox{クラスのアロケーションコスト};
+    ]);
+  >
+
+  +frame{メモリアロケーションを減らす}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{Wasm のプリミティブ};
+      gap 30pt;
+      mid-textbox{i32、i64、f32、f64};
+      gap 40pt;
+      mid-textbox{型は事前にチェックされるので、};
+      gap 20pt;
+      mid-textbox{int と float で事足りる};
+    ]);
+  >
+
+  +frame{ベンチマーク}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{実行時間: 14.185 s -\> 8.300 s};
+      gap 30pt;
+      mid-textbox{メモリ使用量: 187 MiB -\> 187 MiB};
+    ]);
+  >
+
+  +frame{ナイーブな実装を最適化}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{memory.init と table.init 命令の最適化};
+      gap 30pt;
+      mid-textbox{仕様書をなぞった実装になっていて};
+      gap 20pt;
+      mid-textbox{明らかに非効率 (詳細は割愛)};
+    ]);
+  >
+
+  +frame{ベンチマーク}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{実行時間: 8.300 s -\> 6.650 s};
+    ]);
+  >
+
+  +frame{メモリアロケーションを減らす}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{スタックに積まれるもの};
+      gap 40pt;
+      mid-textbox{値、コールフレーム、ラベル};
+    ]);
+  >
+
+  +frame{メモリアロケーションを減らす}<
+    +code-block-php(`final class Stack
+{
+  /**
+   * @param list<StackEntry> $entries
+   */
+  public function __construct(
+    public array $entries,
+  ) {
+  }
+
+  ...
+}`);
+  >
+
+  +frame{メモリアロケーションを減らす}<
+    +code-block-php(`abstract class StackEntry { ... }
+
+final class Value extends StackEntry { ... }
+final class Frame extends StackEntry { ... }
+final class Label extends StackEntry { ... }
+`);
+  >
+
+  +frame{メモリアロケーションを減らす}<
+    +code-block-php(`final class Stack
+{
+  /**
+   * @param list<int|float|Ref|Frame|Label> $entries
+   */
+  public function __construct(
+    public array $entries,
+  ) {
+  }
+
+  ...
+}`);
+  >
+
+  +frame{ベンチマーク}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{実行時間: 6.650 s -\> 4.587 s};
+    ]);
+  >
+
+  +frame{安全装置を切る}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{安全装置を切る};
+    ]);
+  >
+
+  +frame{安全装置を切る}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{安全装置を切る};
+      gap 30pt;
+      mid-textbox{assert() を無効化する};
+    ]);
+  >
+
+  +frame{ベンチマーク}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{実行時間: 4.587 s -\> 3.407 s};
+    ]);
+  >
+
+  +frame{メモリアロケーションを減らす}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{命令の実行結果を表す};
+      gap 20pt;
+      mid-textbox{ControlFlowResult クラス};
+      gap 20pt;
+      mid-textbox{return、br 命令の結果};
+    ]);
+  >
+
+  +frame{メモリアロケーションを減らす}<
+    +code-block-php(`abstract readonly class ControlFlowResult {}
+
+final class Return extends ControlFlowResult {}
+
+final class Br extends ControlFlowResult
+{
+  public function __construct(
+    public int $label,
+  ) {
+  }
+}
+`);
+  >
+
+  +frame{メモリアロケーションを減らす}<
+    +code-block-php(`// => -1
+final class Return extends ControlFlowResult {}
+
+// => $label
+final class Br extends ControlFlowResult
+{
+  public function __construct(
+    public int $label,
+  ) {
+  }
+}
+`);
+  >
+
+  +frame{ベンチマーク}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{実行時間: 3.407 s -\> 3.156 s};
+    ]);
+  >
+
+  +frame{メモリ表現の最適化}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{メモリ表現の最適化がまだ足りない};
+    ]);
+  >
+
+  +frame{メモリ表現の最適化}<
+    +code-block-php(`$data = array_fill(
+  0,
+  $size,
+  str_repeat("\0", 64 * 1024),
+);`);
+    +p{64 KiB の \code(`string`); が \code(`$size`); 個並んだ配列}
+  >
+
+  +frame{メモリ表現の最適化}<
+    +code-block-c(`function loadI32(int $n) {
+  $bytes = $this->sliceNBytes($n, 4);
+  return unpack('l', $bytes)[1];
+}
+`);
+    +p{バイナリ列の切り出しと \code(`unpack()`); のコストが重い}
+  >
+
+  +frame{メモリ表現の最適化}<
+    +code-block-c(`int32_t loadI32(void* rawData, size_t n) {
+  return *(int32_t*)(rawData + n);
+}
+`);
+    +p{Cならこう書ける}
+  >
+
+  +frame{メモリ表現の最適化}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{FFI: foreign function interface};
+      gap 40pt;
+      mid-textbox{アロケーションとポインタのキャストができる};
+    ]);
+  >
+
+  +frame{メモリ表現の最適化}<
+    +code-block-c(`// $this->rawData = $this->ffi->new(
+//   "uint8_t[$this->memorySize]",
+// );
+
+function loadI32(int $n) {
+  $dataAsInt32 = $this->ffi->cast(
+    "int32_t[$this->memorySize / 4]",
+    $this->rawData,
+  );
+  return $dataAsInt32[$n / 4];
+}
+`);
+  >
+
+  +frame{ベンチマーク}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{実行時間: 3.156 s -\> 2.852 s};
+      gap 30pt;
+      mid-textbox{メモリ使用量: 187 MiB -\> 308 MiB};
+    ]);
+  >
+
+  +frame{ベンチマークまとめ}<
+    +fig-center(vconcat [
+      gap 40pt;
+      mid-textbox{実行時間: 33.327 s -\> 2.852 s (11.7 倍)};
+      gap 30pt;
+      mid-textbox{メモリ使用量: 2.2 GiB -\> 308 MiB (7.4 分の1)};
+    ]);
+  >
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  +frame{まとめ}<
+    +fig-center(vconcat [
+      gap 75pt;
+      mid-textbox{10倍以上速くなった};
+      gap 40pt;
+      mid-textbox{メモリアロケーションを減らす};
+      gap 30pt;
+      mid-textbox{すべての改善でベンチマークを取る};
+      gap 30pt;
+      mid-textbox{推測・適用・計測のサイクルを回す};
+    ]);
+  >
+
+  >
+
+>
