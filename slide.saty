@@ -251,25 +251,10 @@ document '<
   +frame{ベンチマーク}<
     +fig-center(vconcat [
       gap 75pt;
-      big-textbox{実行時間: 33.327 -\> 29.274 s};
+      big-textbox{実行時間: 33.327 s -\> 29.274 s};
       gap 30pt;
-      big-textbox{メモリ使用量: 240 MiB (ほぼ10分の1)};
+      big-textbox{メモリ使用量: 2.2 GiB -\> 240 MiB};
     ]);
-  >
-
-  +frame{ボトルネック探しの課題}<
-    +p{Wasm の命令を実行する処理がすべて1つの関数に集約されている}
-    +code-block-php(`function execInstr($instr) {
-  if ($instr instanceof Instrs\Numeric\F32Abs) {
-    ...
-  } elseif ($instr instanceof Instrs\Numeric\F32Add) {
-    ...
-  } elseif ($instr instanceof Instrs\Numeric\F32Ceil) {
-    ...
-  }
-}
-`);
-    +p{どの命令が遅いのかわからない}
   >
 
   +frame{ボトルネック探しの課題}<
@@ -417,9 +402,9 @@ document '<
       gap 30pt;
       mid-textbox{i32、i64、f32、f64};
       gap 40pt;
-      mid-textbox{個別にクラスを用意};
+      mid-textbox{PHP は int/float しか持たないので、区別できない};
       gap 30pt;
-      mid-textbox{クラスのアロケーションコスト};
+      mid-textbox{個別にクラスを用意};
     ]);
   >
 
@@ -599,8 +584,8 @@ final class Br extends ControlFlowResult
   >
 
   +frame{メモリ表現の最適化}<
-    +code-block-php(`function loadI32(int $n) {
-  $bytes = $this->sliceNBytes($n, 4);
+    +code-block-php(`function loadI32(int $p) {
+  $bytes = $this->sliceNBytes($p, 4);
   return unpack('l', $bytes)[1];
 }
 `);
@@ -608,8 +593,8 @@ final class Br extends ControlFlowResult
   >
 
   +frame{メモリ表現の最適化}<
-    +code-block-c(`int32_t loadI32(void* rawData, size_t n) {
-  return *(int32_t*)(rawData + n);
+    +code-block-c(`int32_t loadI32(void* rawData, size_t p) {
+  return *(int32_t*)(rawData + p);
 }
 `);
     +p{Cならこう書ける}
@@ -629,12 +614,12 @@ final class Br extends ControlFlowResult
   "uint8_t[$this->memorySize]",
 );
 
-function loadI32(int $n) {
+function loadI32(int $p) {
   $dataAsInt32 = $this->ffi->cast(
     "int32_t[$this->memorySize / 4]",
     $this->rawData,
   );
-  return $dataAsInt32[$n / 4];
+  return $dataAsInt32[$p / 4];
 }
 `);
   >
@@ -654,6 +639,15 @@ function loadI32(int $n) {
       big-textbox{実行時間: 33.327 s -\> 2.852 s (11.7 倍)};
       gap 30pt;
       big-textbox{メモリ使用量: 2.2 GiB -\> 308 MiB (7.4 分の1)};
+    ]);
+  >
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  +frame{デモ}<
+    +fig-center(vconcat [
+      gap 75pt;
+      ex-big-textbox{// デモでも見せる};
     ]);
   >
 
